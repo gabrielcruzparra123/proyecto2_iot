@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Proyecto 2 real-time</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font: 13px Helvetica, Arial; }
+        form { background: #bbbbbb; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+        form .form-control { border: 0; padding: 10px; width: 100%; margin-right: .5%; }
+        form button { width: 9%;padding: 10px; }
+        #stream-data { list-style-type: none; margin: 0; padding: 0; }
+        #stream-data li { padding: 10px 15px; }
+        #stream-data li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <h2> Gráficas de sensores de temperatura, luz, peso y distancia</h2>
+    <script src="/socket.io/socket.io.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js" charset="utf-8"></script>
+    <canvas id="myCanvas1"></canvas>
+    <canvas id="myCanvas2"></canvas>
+    <canvas id="myCanvas3"></canvas>
+    <canvas id="myCanvas4"></canvas>
+    
+    <script>
+    
+    const socket= io();
+    
+    let counter1=0;
+    socket.on('temperature', function(dataTemperature){
+    myChart1.data.labels.push(counter1);
+    myChart1.data.datasets.forEach(dataset1=>{
+    dataset1.data.push(dataTemperature.value);
+    });
+    counter1++;
+    myChart1.update();
+    });
+    
+    
+    var ctx1 = document.getElementById("myCanvas1").getContext('2d');
+    var myChart1 = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: ["Temperatura"],
+            datasets: [{
+            label:"Temperatura",
+            backgroundColor: 'rgb(32,50,180)',
+            borderColor: 'rgb(61,108,10)',
+            data:[]
+            }]
+        },
+        options: {}
+    });
+
+    
+
+    
+
+    let counter2=0;
+    socket.on('light', function(dataLight){
+    myChart2.data.labels.push(counter2);
+    myChart2.data.datasets.forEach(dataset2=>{
+    dataset2.data.push(dataLight.value);
+    });
+    counter2++;
+    myChart2.update();
+    });
+    
+    
+    var ctx2 = document.getElementById("myCanvas2").getContext('2d');
+    var myChart2 = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ["Luz"],
+            datasets: [{
+            label:"Luz",
+            backgroundColor: 'rgb(182,183,4)',
+            borderColor: 'rgb(180,128,100)',
+            data:[]
+            }]
+        },
+        options: {}
+    });
+    
+
+    
+    let counter3=0;
+    socket.on('weight', function(dataPeso){
+    myChart3.data.labels.push(counter3);
+    myChart3.data.datasets.forEach(dataset3=>{
+    dataset3.data.push(dataPeso.value);
+    });
+    counter3++;
+    myChart3.update();
+    });
+    
+    
+    var ctx3 = document.getElementById("myCanvas3").getContext('2d');
+    var myChart3 = new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: ["Peso"],
+            datasets: [{
+            label:"Peso",
+            backgroundColor: 'rgb(100,100,0)',
+            borderColor: 'rgb(110,0,85)',
+            data:[]
+            }]
+        },
+        options: {}
+    });
+
+    let counter4=0;
+    socket.on('distance', function(dataDistance){
+    myChart4.data.labels.push(counter4);
+    myChart4.data.datasets.forEach(dataset4=>{
+    dataset4.data.push(dataDistance.value);
+    });
+    counter4++;
+    myChart4.update();
+    });
+    
+    
+    var ctx4 = document.getElementById("myCanvas4").getContext('2d');
+    var myChart4 = new Chart(ctx4, {
+        type: 'line',
+        data: {
+            labels: ["Distancia"],
+            datasets: [{
+            label:"Distancia",
+            backgroundColor: 'rgb(100,110,0)',
+            borderColor: 'rgb(110,110,85)',
+            data:[]
+            }]
+        },
+        options: {}
+    });
+
+    </script>
+  </body>
+</html>

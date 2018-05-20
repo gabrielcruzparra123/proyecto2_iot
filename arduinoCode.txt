@@ -1,0 +1,80 @@
+/*Aqui se configuran los pines donde debemos conectar el sensor*/
+#include "HX711.h"
+#include <NewPing.h>
+#define DOUT  A2
+#define CLK  A3
+
+HX711 balanza(DOUT, CLK);
+#define TRIGGER_PIN  12
+#define ECHO_PIN     11
+#define MAX_DISTANCE 200
+
+//Aquí almacenamos los datos recogidos del LDR:
+int valorLDR = 0;
+
+//Y que pin analógico conectarmos el LDR
+int pinLDR = A5;
+// Declaracion de variables globales
+float tempC; // Variable para almacenar el valor obtenido del sensor (0 a 1023)
+int pinLM35 = 0; // Variable del pin de entrada del sensor (A0)
+double peso;
+double distancia;
+float randNumber;
+String stringVal;
+
+/*Crear el objeto de la clase NewPing*/
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+ 
+void setup() {
+  Serial.begin(9600);
+
+  //balanza
+  balanza.set_scale(439430.25); // Establecemos la escala
+  balanza.tare(20);  //El peso actual es considerado Tara
+    
+  randomSeed(analogRead(0));
+  
+}
+ 
+void loop() {
+  
+  // Obtener medicion de tiempo de viaje del sonido y guardar en variable uS
+  int uS = sonar.ping_median();
+  // Imprimir la distancia medida a la consola serial
+  
+  // Calcular la distancia con base en una constante
+  distancia = uS / US_ROUNDTRIP_CM;
+  //balanza
+  peso =balanza.get_units(1);
+  //iluminacion
+  valorLDR = analogRead(pinLDR);
+//temperatura
+// Con analogRead leemos el sensor, recuerda que es un valor de 0 a 1023
+  tempC = analogRead(pinLM35); 
+  // Calculamos la temperatura con la fórmula
+  tempC = (5.0 * tempC * 100.0)/1024.0; 
+  // Envia el dato al puerto serial
+  //ultimo print
+  randNumber = random(1, 10);
+  stringVal = "{ \"topic\": \"distance\", \"channel\": \"0001D\", ";
+  stringVal = stringVal+" \"value\":"+distancia+", \"energy\":"+randNumber+"}";
+  Serial.println(stringVal);
+
+  randNumber = random(1, 10);
+  stringVal = "{ \"topic\": \"temperature\", \"channel\": \"0001T\", ";
+  stringVal = stringVal+" \"value\":"+tempC+", \"energy\":"+randNumber+"}";
+  Serial.println(stringVal);
+
+  randNumber = random(1, 10);
+  stringVal = "{ \"topic\": \"light\", \"channel\": \"0001L\", ";
+  stringVal = stringVal+" \"value\":"+valorLDR+", \"energy\":"+randNumber+"}";
+  Serial.println(stringVal);
+
+  randNumber = random(1, 10);
+  stringVal = "{ \"topic\": \"weight\", \"channel\": \"0001W\", ";
+  stringVal = stringVal+" \"value\":"+peso+", \"energy\":"+randNumber+"}";
+  Serial.println(stringVal);
+  
+    delay(1000);
+
+}
